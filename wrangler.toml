@@ -1,5 +1,5 @@
 name = "next-starter-template"
-main = "src/entry.py"
+main = "src/entr__y.py"
 compatibility_date = "2025-08-01"
 compatibility_flags = ["python_workers"]  # required for Python Workers (beta)
 

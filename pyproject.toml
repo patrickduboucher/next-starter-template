@@ -1,0 +1,10 @@
+[project]
+name = "tile-worker"
+version = "0.1.0"
+description = "Excel generator for tile grids"
+requires-python = ">=3.12"
+
+# openpyxl is pure-Python and works in Python Workers when bundled.
+dependencies = [
+  "openpyxl==3.1.5"
+]

@@ -1,7 +1,12 @@
 name = "next-starter-template"
 main = "src/entry.py"
-compatibility_date = "2025-08-01"
-compatibility_flags = ["python_workers"]  # required for Python Workers (beta)
+compatibility_date = "2025-08-15"
+
+# Keep Python Workers enabled, but explicitly ALLOW legacy globals too
+compatibility_flags = [
+  "python_workers",
+  "disable_python_no_global_handlers"
+]
 
 # If you want to restrict who can call your endpoint, set a secret TOKEN
 # and uncomment the "vars" binding to provide CORS origin

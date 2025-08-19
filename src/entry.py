@@ -10,7 +10,7 @@ def _cors_headers(env):
         "Access-Control-Allow-Methods": "POST, OPTIONS",
     }
 
-# Lazy import so openpyxl only loads on first real request
+# Lazy import so heavy deps (openpyxl) don’t run at startup
 _placer = None
 def _get_placer():
     global _placer
@@ -19,9 +19,8 @@ def _get_placer():
     return _placer
 
 class Default(WorkerEntrypoint):
-    async def fetch(self, request):  # NOTE: signature must be (self, request)
+    async def fetch(self, request):  # Python Workers entrypoint
         env = self.env
-        # ctx = self.ctx  # available if you need it
 
         # CORS preflight
         if request.method == "OPTIONS":
@@ -32,10 +31,9 @@ class Default(WorkerEntrypoint):
         if request.method == "GET" and u.path == "/health":
             return Response("ok", status=200, headers=_cors_headers(env))
         if request.method in ("GET", "POST") and u.path == "/warmup":
-            _get_placer()  # primes the import cache
+            _get_placer()  # primes import cache
             return Response("warmed", status=200, headers=_cors_headers(env))
 
-        # Main endpoint (expects multipart/form-data)
         if request.method != "POST":
             return Response("Use POST", status=405, headers=_cors_headers(env))
 
@@ -66,3 +64,8 @@ class Default(WorkerEntrypoint):
             payload = {"error": str(exc)}
             return Response(json.dumps(payload), status=400,
                             headers={"Content-Type": "application/json", **_cors_headers(env)})
+
+# ---- Legacy fallback for older/alternate runtimes ----
+# If the platform expects a top-level `on_fetch`, route it to Default.fetch.
+async def on_fetch(request):
+    return await Default().fetch(request)

@@ -4,9 +4,7 @@ import random
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple, Set, FrozenSet
 from collections import Counter
-from openpyxl import Workbook
-from openpyxl.styles import PatternFill, Border, Side, Font
-from openpyxl.utils import get_column_letter
+
 
 # ---------- Data classes ----------
 @dataclass(frozen=True)
@@ -305,6 +303,11 @@ def place_all(dre_types, hd_types, reqs, grids_count: int, rows: int, seed: int)
 
 # ---------- Excel export (to bytes) ----------
 def export_workbook_to_bytes(grids, rows, dre_types, hd_types, reqs, unplaced, missing) -> bytes:
+    # Import here to avoid heavy import cost at module import time
+    from openpyxl import Workbook
+    from openpyxl.styles import PatternFill, Border, Side, Font
+    from openpyxl.utils import get_column_letter
+
     GRID_COUNT = len(grids)
     cols = []
     for i in range(1, GRID_COUNT+1):

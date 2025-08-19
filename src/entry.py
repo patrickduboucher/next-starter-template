@@ -1,8 +1,15 @@
 from workers import WorkerEntrypoint, Response
 import io
 import json
+import importlib
 
-from placer import place_and_export  # returns bytes of an .xlsx workbook
+# Lazy-load placer (and thus openpyxl) on first request
+_placer = None
+def _get_placer():
+    global _placer
+    if _placer is None:
+        _placer = importlib.import_module("placer")
+    return _placer
 
 def _cors_headers(env):
     # Adjust CORS to your Squarespace site. For dev, you can return "*".
@@ -43,7 +50,10 @@ class Default(WorkerEntrypoint):
             reqs_bytes  = bytes(await reqs_file.arrayBuffer())
 
             # Run placement and build Excel entirely in memory
-            xlsx_bytes = place_and_export(tiles_bytes, reqs_bytes, grids, rows, seed)
+            #xlsx_bytes = place_and_export(tiles_bytes, reqs_bytes, grids, rows, seed)
+            placer = _get_placer()
+            xlsx_bytes = placer.place_and_export(tiles_bytes, reqs_bytes, grids, rows, seed)
+
 
             headers = {
                 "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

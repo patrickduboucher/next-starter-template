@@ -64,8 +64,3 @@ class Default(WorkerEntrypoint):
             payload = {"error": str(exc)}
             return Response(json.dumps(payload), status=400,
                             headers={"Content-Type": "application/json", **_cors_headers(env)})
-
-# ---- Legacy fallback for older/alternate runtimes ----
-# If the platform expects a top-level `on_fetch`, route it to Default.fetch.
-async def on_fetch(request):
-    return await Default().fetch(request)
